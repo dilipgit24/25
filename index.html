@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <title>Time</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link id="dynamic-favicon" rel="icon" href="data:," />
   <style>
     body {
       margin: 40px auto;
@@ -27,7 +28,7 @@
     #output {
       margin-top: 24px;
       padding: 20px;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
       border-radius: 12px;
       border: 1px solid #ddd;
@@ -35,6 +36,7 @@
       word-wrap: break-word;
       white-space: pre-wrap;
       min-height: 40px;
+      transition: color 0.3s ease;
     }
   </style>
 </head>
@@ -43,7 +45,7 @@
   <div id="output"></div>
 
   <script>
-    const API_URL = "https://tim-backend.vercel.app/api/analyze"; 
+    const API_URL = "https://tim-backend.vercel.app/api/analyze"; // your backend
     const input = document.getElementById("input");
     const output = document.getElementById("output");
 
@@ -62,19 +64,35 @@
           body: JSON.stringify({ text })
         });
         const data = await res.json();
+        output.style.color = "#0a0"; // green on success
         output.textContent = data.output || JSON.stringify(data, null, 2);
       } catch (err) {
+        output.style.color = "#c00"; // red on error
         output.textContent = "Error: " + err.message;
       }
     }
 
-    // analyze automatically when user pastes or types
+  
     input.addEventListener("paste", () =>
       setTimeout(() => analyze(input.value), 50)
     );
     input.addEventListener("input", () =>
       setTimeout(() => analyze(input.value), 300)
     );
+
+   
+    const frames = ["🟩", "🟨", "🟦", "🟧", "🟥", "🟪"];
+    const favicon = document.getElementById("dynamic-favicon");
+    let i = 0;
+    setInterval(() => {
+      const emoji = frames[i++ % frames.length];
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 64;
+      const ctx = canvas.getContext("2d");
+      ctx.font = "64px serif";
+      ctx.fillText(emoji, 0, 64);
+      favicon.href = canvas.toDataURL();
+    }, 400);
   </script>
 </body>
 </html>
